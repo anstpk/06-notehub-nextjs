@@ -29,8 +29,9 @@ export interface CreateNoteData {
   tag: string;
 }
 
-export const createNote = async (noteData: CreateNoteData) => {
-  const { data } = await noteApi.post('/notes', noteData);
+export const createNote = async (noteData: CreateNoteData): Promise<Note> => {
+  // Додаємо <Note> перед дужками виклику post
+  const { data } = await noteApi.post<Note>('/notes', noteData);
   return data;
 };
 

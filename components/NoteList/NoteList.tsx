@@ -6,26 +6,38 @@ import { Note } from '@/types/note';
 import Link from 'next/link';
 import css from './NoteList.module.css';
 
-export default function NoteList({ notes }: { notes: Note[] }) {
+// Створюємо окремий інтерфейс (Вимога ментора)
+interface NoteListProps {
+  notes: Note[];
+}
+
+export default function NoteList({ notes }: NoteListProps) {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
     mutationFn: (id: string) => deleteNote(id),
     onSuccess: () => {
-      // Інвалідація кешу, щоб список оновився сам
       queryClient.invalidateQueries({ queryKey: ['notes'] });
     },
   });
 
   return (
-    <ul>
+    <ul className={css.list}>
       {notes.map((note) => (
-        <li key={note.id}>
-          <Link href={`/notes/${note.id}`}>
-            <h3>{note.title}</h3>
-            <p>{note.content}</p> {/* Ментор просив додати контент */}
+        <li key={note.id} className={css.item}>
+          <Link href={`/notes/${note.id}`} className={css.link}>
+            <div className={css.header}>
+               <h3 className={css.title}>{note.title}</h3>
+               {/* Відображаємо тег (Вимога ментора) */}
+               <span className={css.tag}>{note.tag}</span>
+            </div>
+            <p className={css.content}>{note.content}</p>
           </Link>
-          <button onClick={() => mutation.mutate(note.id)}>
+          <button 
+            className={css.deleteBtn} 
+            onClick={() => mutation.mutate(note.id)}
+            disabled={mutation.isPending}
+          >
             {mutation.isPending ? 'Deleting...' : 'Delete'}
           </button>
         </li>

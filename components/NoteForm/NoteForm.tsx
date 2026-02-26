@@ -6,20 +6,18 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createNote } from '@/lib/api';
 import css from './NoteForm.module.css';
 
-// 1. Схема валідації Yup (Вимога ментора)
+// 1. Оновлена схема валідації
 const NoteSchema = Yup.object().shape({
   title: Yup.string()
     .min(3, 'Title is too short!')
     .max(50, 'Title is too long!')
     .required('Title is required'),
   content: Yup.string()
-    .min(10, 'Content should be at least 10 characters')
-    .required('Content is required'),
+    .max(500, 'Content is too long (max 500 characters)'), // Тепер необов'язкове, без .required()
   tag: Yup.string()
     .required('Please select a tag'),
 });
 
-// 2. Інтерфейс пропсів (Вимога ментора — жодних 'any')
 interface NoteFormProps {
   onClose: () => void;
 }
@@ -27,14 +25,11 @@ interface NoteFormProps {
 export default function NoteForm({ onClose }: NoteFormProps) {
   const queryClient = useQueryClient();
 
-  // 3. Використання useMutation (Вимога ментора)
   const mutation = useMutation({
-    mutationFn: (values: { title: string; content: string; tag: string }) => 
-      createNote(values),
+    mutationFn: createNote, // Спростили запис
     onSuccess: () => {
-      // Інвалідація кешу, щоб список нотаток оновився автоматично
       queryClient.invalidateQueries({ queryKey: ['notes'] });
-      onClose(); // Закриваємо модалку після успіху
+      onClose();
     },
   });
 
@@ -49,52 +44,36 @@ export default function NoteForm({ onClose }: NoteFormProps) {
       >
         {({ isSubmitting }) => (
           <Form className={css.form}>
-            {/* Поле Title */}
             <div className={css.fieldGroup}>
               <label htmlFor="title">Title</label>
-              <Field name="title" className={css.input} placeholder="Enter title..." />
+              <Field name="title" className={css.input} />
               <ErrorMessage name="title" component="div" className={css.error} />
             </div>
 
-            {/* Поле Content */}
             <div className={css.fieldGroup}>
               <label htmlFor="content">Content</label>
-              <Field 
-                name="content" 
-                as="textarea" 
-                className={css.textarea} 
-                placeholder="Write your note here..." 
-              />
+              <Field name="content" as="textarea" className={css.textarea} />
               <ErrorMessage name="content" component="div" className={css.error} />
             </div>
 
-            {/* Поле Tag (Вимога ментора - Select dropdown) */}
             <div className={css.fieldGroup}>
               <label htmlFor="tag">Tag</label>
               <Field name="tag" as="select" className={css.select}>
                 <option value="">Select a tag</option>
-                <option value="Personal">Personal</option>
+                <option value="Todo">Todo</option>
                 <option value="Work">Work</option>
-                <option value="Health">Health</option>
-                <option value="General">General</option>
+                <option value="Personal">Personal</option>
+                <option value="Meeting">Meeting</option>
+                <option value="Shopping">Shopping</option>
               </Field>
               <ErrorMessage name="tag" component="div" className={css.error} />
             </div>
 
-            {/* Кнопки керування (Вимога ментора - додати Cancel) */}
             <div className={css.buttons}>
-              <button 
-                type="button" 
-                className={css.cancelBtn} 
-                onClick={onClose}
-              >
+              <button type="button" className={css.cancelBtn} onClick={onClose}>
                 Cancel
               </button>
-              <button 
-                type="submit" 
-                className={css.submitBtn} 
-                disabled={isSubmitting || mutation.isPending}
-              >
+              <button type="submit" className={css.submitBtn} disabled={isSubmitting || mutation.isPending}>
                 {mutation.isPending ? 'Saving...' : 'Create Note'}
               </button>
             </div>
