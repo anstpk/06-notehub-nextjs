@@ -2,7 +2,7 @@
 
 import { useState } from 'react'; // Додаємо useState
 import { useQuery } from '@tanstack/react-query';
-import { fetchNotes } from '@/lib/api/noteApi';
+import { fetchNotes } from '@/lib/api';
 import NoteList from '@/components/NoteList/NoteList';
 import SearchBox from '@/components/SearchBox/SearchBox';
 import css from './NotesPage.module.css';
