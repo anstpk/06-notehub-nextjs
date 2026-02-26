@@ -1,19 +1,19 @@
+'use client';
+
 import css from './SearchBox.module.css';
 
 interface SearchBoxProps {
-  value: string;
-  onChange: (value: string) => void;
+  onChange: (value: string) => void; // Тепер нам потрібен тільки колбек
 }
 
-export default function SearchBox({ value, onChange }: SearchBoxProps) {
+export default function SearchBox({ onChange }: SearchBoxProps) {
   return (
-    <div className={css.container}>
+    <div className={css.searchWrapper}>
       <input
         type="text"
-        className={css.input}
         placeholder="Search notes..."
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
+        className={css.input}
+        onChange={(e) => onChange(e.target.value)} // Викликаємо при зміні
       />
     </div>
   );

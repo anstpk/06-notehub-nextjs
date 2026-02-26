@@ -1,30 +1,32 @@
-import Link from 'next/link';
+'use client';
+
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { deleteNote } from '@/lib/api';
 import { Note } from '@/types/note';
-import css from './NoteList.module.css';
+import Link from 'next/link';
 
-interface NoteListProps {
-  notes: Note[];
-  onDelete?: (id: string) => void;
-}
+export default function NoteList({ notes }: { notes: Note[] }) {
+  const queryClient = useQueryClient();
 
-export default function NoteList({ notes, onDelete }: NoteListProps) {
+  const mutation = useMutation({
+    mutationFn: (id: string) => deleteNote(id),
+    onSuccess: () => {
+      // Інвалідація кешу, щоб список оновився сам
+      queryClient.invalidateQueries({ queryKey: ['notes'] });
+    },
+  });
+
   return (
-    <ul className={css.list}>
+    <ul>
       {notes.map((note) => (
-        <li key={note.id} className={css.item}>
-          <h3 className={css.title}>{note.title}</h3>
-          <p className={css.tag}>{note.tag}</p>
-          <div className={css.actions}>
-            <Link href={`/notes/${note.id}`} className={css.link}>
-              View details
-            </Link>
-            <button 
-              onClick={() => onDelete && onDelete(note.id)} 
-              className={css.button}
-            >
-              Delete
-            </button>
-          </div>
+        <li key={note.id}>
+          <Link href={`/notes/${note.id}`}>
+            <h3>{note.title}</h3>
+            <p>{note.content}</p> {/* Ментор просив додати контент */}
+          </Link>
+          <button onClick={() => mutation.mutate(note.id)}>
+            {mutation.isPending ? 'Deleting...' : 'Delete'}
+          </button>
         </li>
       ))}
     </ul>

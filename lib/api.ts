@@ -23,9 +23,14 @@ export const fetchNotes = async (page = 1, perPage = 12, search = ''): Promise<F
   return data;
 };
 
-// Створення нотатки
-export const createNote = async (note: Omit<Note, 'id' | 'createdAt' | 'updatedAt'>): Promise<Note> => {
-  const { data } = await noteApi.post<Note>('/notes', note);
+export interface CreateNoteData {
+  title: string;
+  content: string;
+  tag: string;
+}
+
+export const createNote = async (noteData: CreateNoteData) => {
+  const { data } = await noteApi.post('/notes', noteData);
   return data;
 };
 
