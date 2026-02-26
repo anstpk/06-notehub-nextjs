@@ -1,0 +1,42 @@
+import axios from 'axios';
+import { Note } from '@/types/note'; // Переконайся, що шлях правильний
+
+// Створюємо екземпляр axios з правильним baseURL від GoIT
+const noteApi = axios.create({
+  baseURL: 'https://notehub-public.goit.study/api',
+  headers: {
+    // Використовуємо нову назву змінної оточення для Next.js
+    Authorization: `Bearer ${process.env.NEXT_PUBLIC_NOTEHUB_TOKEN}`,
+  },
+});
+
+export interface FetchNotesResponse {
+  notes: Note[];
+  totalPages: number;
+}
+
+// Отримання всіх нотаток (з пагінацією та пошуком)
+export const fetchNotes = async (page = 1, perPage = 12, search = ''): Promise<FetchNotesResponse> => {
+  const { data } = await noteApi.get<FetchNotesResponse>('/notes', {
+    params: { page, perPage, search },
+  });
+  return data;
+};
+
+// Створення нотатки
+export const createNote = async (note: Omit<Note, 'id' | 'createdAt' | 'updatedAt'>): Promise<Note> => {
+  const { data } = await noteApi.post<Note>('/notes', note);
+  return data;
+};
+
+// Видалення нотатки
+export const deleteNote = async (id: string): Promise<Note> => {
+  const { data } = await noteApi.delete<Note>(`/notes/${id}`);
+  return data;
+};
+
+// НОВА ФУНКЦІЯ: Отримання однієї нотатки по ID для динамічного маршруту
+export const fetchNoteById = async (id: string): Promise<Note> => {
+  const { data } = await noteApi.get<Note>(`/notes/${id}`);
+  return data;
+};
