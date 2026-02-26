@@ -12,9 +12,9 @@ export default function NotesClient() {
   const [searchQuery, setSearchQuery] = useState('');
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ['notes', searchQuery], // Додаємо searchQuery в ключ, щоб запит оновлювався
-    queryFn: () => fetchNotes(1, 12, searchQuery),
-  });
+  queryKey: ['notes', searchQuery],
+  queryFn: () => fetchNotes(1, 12, searchQuery),
+});
 
   if (isLoading) return <p>Loading, please wait...</p>;
   if (error) return <p>Something went wrong.</p>;
